@@ -1,0 +1,89 @@
+classDiagram
+    direction TB
+    class PrefectTask {
+      <<prefect.task>>
+    }
+    class Step {
+      -fn
+      -prefect_task
+      +__call__()
+      +_run()
+      +get_meta_info()
+      +add_additional_info()
+    }
+    class step_decorator as "@step" {
+      <<decorator>>
+    }
+    class action_step_decorator as "@action_step" {
+      <<decorator>>
+    }
+    class numeric_limit_decorator as "@numeric_limit_step" {
+      <<decorator>>
+    }
+    class pass_fail_decorator as "@pass_fail_step" {
+      <<decorator>>
+    }
+    class string_check_decorator as "@string_check_step" {
+      <<decorator>>
+    }
+    class waveform_limit_decorator as "@waveform_limit_step" {
+      <<decorator>>
+    }
+    class Sequence {
+      +name
+      +steps
+      +results
+      +run()
+      +run_step()
+      +add_step()
+    }
+    class TestSequence {
+      +setup_steps
+      +main_steps
+      +cleanup_steps
+      +run()
+      +run_step()
+    }
+    class ProcessModel {
+      +pre_uut
+      +main_callback
+      +post_uut
+      +report
+      +database_logging
+      +run()
+    }
+    class PyTestflowState {
+      +ptf_result
+      +children
+      +summarize()
+    }
+    class ptf_context {
+      +globals
+      +locals
+      +results
+      +current_step
+    }
+
+    Step --> PrefectTask : wraps via @task
+    step_decorator --> Step : superdecorator
+    action_step_decorator --> step_decorator
+    numeric_limit_decorator --> step_decorator
+    pass_fail_decorator --> step_decorator
+    string_check_decorator --> step_decorator
+    waveform_limit_decorator --> step_decorator
+
+    Sequence o--> Step : executes ordered
+    TestSequence --|> Sequence
+    ProcessModel --|> Sequence
+    ProcessModel o--> Sequence : main_callback
+    ProcessModel o--> action_step_decorator : wraps callbacks
+
+    Sequence --> PyTestflowState : aggregates results
+    ProcessModel --> PyTestflowState : lifecycle result
+    Step --> PyTestflowState : returns state
+
+    Step --> ptf_context : reads/writes locals/globals
+    Sequence --> ptf_context : manages scope stack
+    ProcessModel --> ptf_context : shares run data
+    ptf_context --> Sequence : parameters/defaults
+    ptf_context --> ProcessModel : provides shared state

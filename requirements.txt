@@ -1,0 +1,5 @@
+prefect==3.6.24
+pandas
+numpy
+rich
+bottle
