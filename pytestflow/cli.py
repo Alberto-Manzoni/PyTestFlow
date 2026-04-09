@@ -46,6 +46,7 @@ def workspace_paths(root: Path) -> dict[str, Path]:
 def _copy_templates(paths: dict[str, Path]) -> list[tuple[str, Path]]:
     copied = []
 
+    # --- Copia i template come prima ---
     for key, parts in TEMPLATE_SOURCE_MAP.items():
         destination_dir = paths[key]
 
@@ -71,6 +72,22 @@ def _copy_templates(paths: dict[str, Path]) -> list[tuple[str, Path]]:
                 shutil.copy2(src, target)
                 print(f"[copied] {target}")
                 copied.append((key, target))
+
+    # --- Copia anche config.yaml ---
+    try:
+        config_dest = paths["root"] / "config.yaml"
+        if not config_dest.exists():
+            # supponendo che config.yaml sia in bootstrap_templates/config.yaml
+            source_file = resources.files("bootstrap_templates").joinpath("config.yaml")
+            with resources.as_file(source_file) as f:
+                shutil.copy2(f, config_dest)
+                print(f"[copied] config.yaml -> {config_dest}")
+                copied.append(("config", config_dest))
+        else:
+            print(f"[skipped] config.yaml already exists at {config_dest}")
+
+    except Exception as e:
+        print(f"[ERROR] Could not copy default config.yaml: {e}")
 
     return copied
 
