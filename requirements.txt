@@ -3,3 +3,4 @@ pandas
 numpy
 rich
 bottle
+fakeredis==2.34.1
