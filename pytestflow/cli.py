@@ -3,7 +3,8 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from importlib.resources import resources
+from importlib import resources
+from pytestflow.backend.start_backend import main as start_backend
 
 APP_DIR_NAME = "pytestflow"
 
@@ -11,9 +12,9 @@ APP_DIR_NAME = "pytestflow"
 # Template map
 # --------------------
 TEMPLATE_SOURCE_MAP = {
-    "process_models": ("pytestflow", "bootstrap_templates/process_models"),
-    "test_sequences": ("pytestflow", "bootstrap_templates/test_sequences"),
-    "custom_step_types": ("pytestflow", "bootstrap_templates/custom_step_types"),
+    "process_models": ("bootstrap_templates", "process_models"),
+    "test_sequences": ("bootstrap_templates", "test_sequences"),
+    "custom_step_types": ("bootstrap_templates", "custom_step_types"),
 }
 
 # --------------------
@@ -41,69 +42,39 @@ def workspace_paths(root: Path) -> dict[str, Path]:
         paths[name] = root / name
     return paths
 
-# --------------------
-# Copy helper robusto
-# --------------------
-def copy_resource_tree(package: str, src_path: str, dest: Path):
-    """
-    Copia ricorsivamente file e cartelle dal package Python a dest.
-    Funziona anche su pacchetti installati da GitHub o zip.
-    """
-    dest.mkdir(parents=True, exist_ok=True)
 
-    print(resources.files("pytestflow").joinpath("bootstrap_templates").joinpath("config.yaml"))
-
-    # Scansione sicura dei contenuti
-    for item in resources.contents(package):
-        if not item.startswith(Path(src_path).name):
-            continue
-
-        relative = Path(item).relative_to(Path(src_path).name)
-        target = dest / relative
-
-        try:
-            if resources.is_resource(package, item):
-                # file
-                with resources.as_file(resources.files(package).joinpath(item)) as f:
-                    shutil.copy2(f, target)
-            else:
-                # directory
-                copy_resource_tree(package, item, target)
-        except Exception:
-            # ignora file non compatibili
-            pass
-
-# --------------------
-# Copy templates
-# --------------------
 def _copy_templates(paths: dict[str, Path]) -> list[tuple[str, Path]]:
     copied = []
 
-    for key, (pkg, folder) in TEMPLATE_SOURCE_MAP.items():
-        try:
-            dest = paths[key]
-            copy_resource_tree(pkg, folder, dest)
-            copied.append((key, dest))
-        except Exception as e:
-            print(f"[ERROR] Cannot copy templates for {key}: {e}")
+    for key, parts in TEMPLATE_SOURCE_MAP.items():
+        destination_dir = paths[key]
 
-    # Copia config.yaml
-    try:
-        config_dest = paths["root"] / "config.yaml"
-        if not config_dest.exists():
-            with resources.as_file(resources.files("pytestflow").joinpath("bootstrap_templates").joinpath("config.yaml")) as f:
-                shutil.copy2(f, config_dest)
-            copied.append(("config", config_dest))
-        else:
-            print(f"[skipped] config.yaml already exists at {config_dest}")
-    except Exception as e:
-        print(f"[ERROR] Could not copy default config.yaml: {e}")
+        try:
+            package = parts[0]
+            inner_path = parts[1:]
+
+            source_dir = resources.files(package).joinpath(*inner_path)
+
+            with resources.as_file(source_dir) as source_path:
+                source_dir_path = Path(source_path)
+
+        except Exception as e:
+            print(f"[ERROR] Cannot load templates for {key}: {e}")
+            continue
+
+        for src in source_dir_path.rglob("*"):
+            if src.is_file():
+                relative = src.relative_to(source_dir_path)
+                target = destination_dir / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+
+                shutil.copy2(src, target)
+                print(f"[copied] {target}")
+                copied.append((key, target))
 
     return copied
 
-# --------------------
-# Initialize workspace
-# --------------------
+
 def initialize_workspace_interactive() -> dict[str, Path]:
     print("PyTestFlow workspace initialization:")
     choice = input(
@@ -129,13 +100,14 @@ def initialize_workspace_interactive() -> dict[str, Path]:
     else:
         print("[copied] No new files copied, templates already exist.")
 
-    # Set environment variable prompt
+    # Print environment variable command
     if sys.platform.startswith("win"):
         print(f"\nSet environment variable for this session in PowerShell:\n$env:PYTESTFLOW_HOME='{root}'")
     else:
         print(f"\nSet environment variable for this session in bash/zsh:\nexport PYTESTFLOW_HOME='{root}'")
 
     return paths
+
 
 # --------------------
 # CLI
@@ -175,7 +147,6 @@ def main(argv=None) -> int:
         return 0
 
     if command == "start":
-        from pytestflow.backend.start_backend import main as start_backend
         start_backend(open_browser=getattr(args, "open", False))
         return 0
 
