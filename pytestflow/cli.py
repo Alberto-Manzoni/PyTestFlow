@@ -97,14 +97,21 @@ def initialize_workspace_interactive() -> dict[str, Path]:
         try:
             # Try resources first (for installed packages)
             config_src = resources.files("bootstrap_templates") / "config.yaml"
+            print(f"Trying resources: {config_src}")
             with resources.as_file(config_src) as src_path:
                 target = paths["root"] / "config.yaml"
                 shutil.copy2(src_path, target)
-        except Exception:
+                print(f"Used resources: {src_path}")
+        except Exception as e:
+            print(f"Resources failed: {e}")
             # Fallback to Path (for editable installs)
             config_src = Path(__file__).parent.parent / "bootstrap_templates" / "config.yaml"
             target = paths["root"] / "config.yaml"
-            shutil.copy2(config_src, target)
+            print(f"Using Path: {config_src}")
+            if not config_src.exists():
+                print(f"File does not exist: {config_src}")
+            else:
+                shutil.copy2(config_src, target)
         print(f"[copied] config.yaml: {target}")
         copied.append(("config", target))
     except Exception as e:
