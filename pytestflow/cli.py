@@ -4,7 +4,6 @@ import shutil
 import sys
 from pathlib import Path
 from importlib import resources
-from pytestflow.backend.start_backend import main as start_backend
 
 APP_DIR_NAME = "pytestflow"
 
@@ -147,6 +146,7 @@ def main(argv=None) -> int:
         return 0
 
     if command == "start":
+        from pytestflow.backend.start_backend import main as start_backend
         start_backend(open_browser=getattr(args, "open", False))
         return 0
 
