@@ -3,7 +3,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from importlib import resources
+from importlib.resources import resources
 
 APP_DIR_NAME = "pytestflow"
 
@@ -50,6 +50,8 @@ def copy_resource_tree(package: str, src_path: str, dest: Path):
     Funziona anche su pacchetti installati da GitHub o zip.
     """
     dest.mkdir(parents=True, exist_ok=True)
+
+    print(resources.files("pytestflow").joinpath("bootstrap_templates").joinpath("config.yaml"))
 
     # Scansione sicura dei contenuti
     for item in resources.contents(package):
