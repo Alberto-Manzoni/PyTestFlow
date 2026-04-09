@@ -8,12 +8,11 @@ setup(
     author_email="alb.manzoni@gmail.com",
     url="https://github.com/Alberto-Manzoni/PyTestFlow",
     packages=find_packages(),
-    include_package_data=True,
+    include_package_data=True,  # fondamentale per MANIFEST.in
     package_data={
         "pytestflow": [
-            "bootstrap_templates/*.py",
-            "bootstrap_templates/*.md",
-            "bootstrap_templates/*.yaml",
+            "bootstrap_templates/*.*",  # includi tutti i file nella cartella bootstrap_templates
+            "backend/frontend/*.*"       # se vuoi includere anche frontend statici
         ]
     },
     install_requires=[
