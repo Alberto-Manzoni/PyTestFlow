@@ -8,7 +8,14 @@ setup(
     author_email="alb.manzoni@gmail.com",
     url="https://github.com/Alberto-Manzoni/PyTestFlow",
     packages=find_packages(),
-    include_package_data=True,  # fondamentale!
+    include_package_data=True,
+    package_data={
+        "pytestflow": [
+            "bootstrap_templates/*.py",
+            "bootstrap_templates/*.md",
+            "bootstrap_templates/*.yaml",
+        ]
+    },
     install_requires=[
         "prefect==3.6.24",
         "pandas",
