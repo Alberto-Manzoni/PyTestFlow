@@ -16,7 +16,6 @@ setup(
         "rich",
         "bottle",
         "websockets",
-        "PyQt5",
     ],
     entry_points={
         "console_scripts": [
