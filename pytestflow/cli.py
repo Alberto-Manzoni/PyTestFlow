@@ -89,7 +89,7 @@ def _copy_templates(paths: dict[str, Path]) -> list[tuple[str, Path]]:
     try:
         config_dest = paths["root"] / "config.yaml"
         if not config_dest.exists():
-            with resources.as_file(resources.files("pytestflow").joinpath("bootstrap_templates/config.yaml")) as f:
+            with resources.as_file(resources.files("pytestflow").joinpath("bootstrap_templates").joinpath("config.yaml")) as f:
                 shutil.copy2(f, config_dest)
             copied.append(("config", config_dest))
         else:
