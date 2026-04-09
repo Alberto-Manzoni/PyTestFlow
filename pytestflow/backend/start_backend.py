@@ -8,9 +8,15 @@ from bottle import Bottle, response, run, static_file, route, abort
 from pathlib import Path
 from pytestflow.backend.websocket_gateway import start_server
 from pytestflow.backend.report_manager import report_manager
-from pytestflow.config.bootstrap import get_config
+from pytestflow.config.config_manager import ConfigManager
 
-CONFIG = get_config()
+CONFIG = ConfigManager().get_config()
+
+print("Loaded configuration:---------------")
+print(CONFIG)
+print("-----------------------------------")
+
+
 
 # --------------------
 # Paths
@@ -46,10 +52,10 @@ def assets(filepath):
 
 @app.route("/config.json")
 def config():
+    print("Serving config.json")
     response.content_type = 'application/json'
     return {
-        "wsPort": CONFIG["ws_port"],
-        "env": "dev",
+        "wsPort": CONFIG["websocket"]["port"],
         "featureFlags": {
             "reports": True
         }
@@ -65,8 +71,8 @@ def spa_fallback(filepath):
 def start_http():
     run(
         app,
-        host=CONFIG["http_host"],
-        port=CONFIG["http_port"],
+        host=CONFIG["http"]["host"],
+        port=CONFIG["http"]["port"],
         quiet=True,
         reloader=False,
     )
@@ -77,7 +83,7 @@ def start_http():
 # --------------------
 
 def start_ws():
-    asyncio.run(start_server(ws_host=CONFIG["ws_host"], ws_port=CONFIG["ws_port"]))
+    asyncio.run(start_server(ws_host=CONFIG["websocket"]["host"], ws_port=CONFIG["websocket"]["port"]))
 
 
 # --------------------
@@ -85,8 +91,8 @@ def start_ws():
 # --------------------
 
 def main(open_browser=False):
-    gui_url = f"http://{CONFIG["http_host"]}:{CONFIG["http_port"]}/"
-    ws_url = f"ws://{CONFIG["ws_host"]}:{CONFIG["ws_port"]}"
+    gui_url = f"http://{CONFIG["http"]["host"]}:{CONFIG["http"]["port"]}/"
+    ws_url = f"ws://{CONFIG["websocket"]["host"]}:{CONFIG["websocket"]["port"]}"
     starter_path = os.path.normpath(
         os.path.join(os.path.dirname(BASE_DIR), "starter_here.md")
     )

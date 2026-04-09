@@ -5,16 +5,16 @@ import sys
 from pathlib import Path
 import json
 from pytestflow.backend.uuids_handler import get_root_sequence_uuid, walk_sequence, resolve_uuids
-from pytestflow.config.bootstrap import get_config
+from pytestflow.config.config_manager import ConfigManager
 
-config = get_config()
+config = ConfigManager()
 
 
 def get_available_sequences():
     """Returns a list of available sequence names from the sequences folder."""
     sequences = []
     try:
-        SEQUENCES_FOLDER = config["test_sequences"]
+        SEQUENCES_FOLDER = config.get_path("test_sequences")
         print(f"Looking for sequences in: {SEQUENCES_FOLDER}")
         seq_folder = Path(SEQUENCES_FOLDER)
         if seq_folder.exists() and seq_folder.is_dir():
@@ -72,7 +72,7 @@ def get_seq_structure_recursive(sequence):
 
 def get_seq_structure(sequence_name: str):
     try:
-        SEQUENCES_FOLDER = config["test_sequences"]
+        SEQUENCES_FOLDER = config.get_path("test_sequences")
     except ImportError:
         return json.dumps({"error": "SEQUENCES_FOLDER not defined in config.py"})
     

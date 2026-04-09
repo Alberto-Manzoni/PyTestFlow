@@ -3,9 +3,9 @@ from __future__ import annotations
 import os, html, re
 from datetime import datetime
 from typing import Any
-from pytestflow.config.bootstrap import get_config
+from pytestflow.config.config_manager import ConfigManager
 
-config = get_config()
+config = ConfigManager().get_config()
 REPORTS_FOLDER = config["test_reports"]
 
 

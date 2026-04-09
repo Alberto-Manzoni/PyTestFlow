@@ -3,10 +3,10 @@ import sys
 from pathlib import Path
 from prefect import flow
 from prefect.context import get_run_context
-from pytestflow.config.bootstrap import get_config
+from pytestflow.config.config_manager import ConfigManager
 
-config = get_config()
-process_models_dir = config["process_models"]
+config = ConfigManager()
+process_models_dir = config.get_path("process_models")
 
 def load_sequential_model(process_models_dir: str):
     file_path = Path(process_models_dir) / "sequential_model.py"

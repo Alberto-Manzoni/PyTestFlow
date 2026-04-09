@@ -1,12 +1,12 @@
 http:
   host: 127.0.0.1
-  port: 8000
+  port: 8001
 
 websocket:
   host: 127.0.0.1
-  port: 8765
+  port: 8766
 
-examples_folder: examples
+
 process_models: process_models
 test_sequences: test_sequences
 test_reports: test_reports
