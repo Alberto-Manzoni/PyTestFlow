@@ -1,3 +1,3 @@
-recursive-include pytestflow/bootstrap_templates *.*
+recursive-include bootstrap_templates *.*
 recursive-include pytestflow/backend/frontend *.*
 include pytestflow/starter_here.md
