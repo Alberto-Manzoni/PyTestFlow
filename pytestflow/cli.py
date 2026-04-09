@@ -94,11 +94,12 @@ def initialize_workspace_interactive() -> dict[str, Path]:
 
     # Copy config.yaml to root
     try:
-        config_src = Path(__file__).parent.parent / "bootstrap_templates" / "config.yaml"
-        target = paths["root"] / "config.yaml"
-        shutil.copy2(config_src, target)
-        print(f"[copied] config.yaml: {target}")
-        copied.append(("config", target))
+        config_src = resources.files("bootstrap_templates") / "config.yaml"
+        with resources.as_file(config_src) as src_path:
+            target = paths["root"] / "config.yaml"
+            shutil.copy2(src_path, target)
+            print(f"[copied] config.yaml: {target}")
+            copied.append(("config", target))
     except Exception as e:
         print(f"[ERROR] Cannot copy config.yaml: {e}")
 
