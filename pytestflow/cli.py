@@ -92,6 +92,17 @@ def initialize_workspace_interactive() -> dict[str, Path]:
 
     copied = _copy_templates(paths)
 
+    # Copy config.yaml to root
+    try:
+        config_src = resources.files("bootstrap_templates") / "config.yaml"
+        with resources.as_file(config_src) as src_path:
+            target = paths["root"] / "config.yaml"
+            shutil.copy2(src_path, target)
+            print(f"[copied] config.yaml: {target}")
+            copied.append(("config", target))
+    except Exception as e:
+        print(f"[ERROR] Cannot copy config.yaml: {e}")
+
     print(f"\nPyTestFlow workspace initialized at: {root}")
     if copied:
         for key, target in copied:
