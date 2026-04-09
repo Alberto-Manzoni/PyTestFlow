@@ -22,6 +22,7 @@ setup(
         "rich",
         "bottle",
         "websockets",
+        "fakeredis==2.34.1",
     ],
     entry_points={
         "console_scripts": [
