@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 from importlib import resources
 
-
 APP_DIR_NAME = "pytestflow"
 
 # --------------------
@@ -46,19 +45,14 @@ def workspace_paths(root: Path) -> dict[str, Path]:
 def _copy_templates(paths: dict[str, Path]) -> list[tuple[str, Path]]:
     copied = []
 
-    # --- Copia i template come prima ---
-    for key, parts in TEMPLATE_SOURCE_MAP.items():
+    for key, inner_path in TEMPLATE_SOURCE_MAP.items():
         destination_dir = paths[key]
-
         try:
-            package = parts[0]
-            inner_path = parts[1:]
-
-            source_dir = resources.files(package).joinpath(*inner_path)
+            # riferimento corretto al pacchetto pytestflow
+            source_dir = resources.files("pytestflow").joinpath(*inner_path)
 
             with resources.as_file(source_dir) as source_path:
                 source_dir_path = Path(source_path)
-
         except Exception as e:
             print(f"[ERROR] Cannot load templates for {key}: {e}")
             continue
@@ -68,24 +62,21 @@ def _copy_templates(paths: dict[str, Path]) -> list[tuple[str, Path]]:
                 relative = src.relative_to(source_dir_path)
                 target = destination_dir / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
-
                 shutil.copy2(src, target)
                 print(f"[copied] {target}")
                 copied.append((key, target))
 
-    # --- Copia anche config.yaml ---
+    # Copia config.yaml
     try:
         config_dest = paths["root"] / "config.yaml"
         if not config_dest.exists():
-            # supponendo che config.yaml sia in bootstrap_templates/config.yaml
-            source_file = resources.files("bootstrap_templates").joinpath("config.yaml")
+            source_file = resources.files("pytestflow").joinpath("bootstrap_templates", "config.yaml")
             with resources.as_file(source_file) as f:
                 shutil.copy2(f, config_dest)
                 print(f"[copied] config.yaml -> {config_dest}")
                 copied.append(("config", config_dest))
         else:
             print(f"[skipped] config.yaml already exists at {config_dest}")
-
     except Exception as e:
         print(f"[ERROR] Could not copy default config.yaml: {e}")
 
@@ -94,9 +85,7 @@ def _copy_templates(paths: dict[str, Path]) -> list[tuple[str, Path]]:
 
 def initialize_workspace_interactive() -> dict[str, Path]:
     print("PyTestFlow workspace initialization:")
-    choice = input(
-        "Install templates in current folder (c) or default location (d)? [d/c]: "
-    ).strip().lower()
+    choice = input("Install templates in current folder (c) or default location (d)? [d/c]: ").strip().lower()
 
     if choice == "c":
         root = Path.cwd()
@@ -117,7 +106,6 @@ def initialize_workspace_interactive() -> dict[str, Path]:
     else:
         print("[copied] No new files copied, templates already exist.")
 
-    # Print environment variable command
     if sys.platform.startswith("win"):
         print(f"\nSet environment variable for this session in PowerShell:\n$env:PYTESTFLOW_HOME='{root}'")
     else:
@@ -146,7 +134,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Open the GUI URL in your default browser",
     )
 
-    init_parser = subparsers.add_parser(
+    subparsers.add_parser(
         "init",
         help="Initialize PyTestFlow workspace and copy templates",
     )
