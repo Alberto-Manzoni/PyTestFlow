@@ -4,7 +4,7 @@ import threading
 import traceback
 import webbrowser
 from importlib import resources
-from bottle import Bottle, run, static_file, route, abort
+from bottle import Bottle, response, run, static_file, route, abort
 from pathlib import Path
 from pytestflow.backend.websocket_gateway import start_server
 from pytestflow.backend.report_manager import report_manager
@@ -42,6 +42,18 @@ def index():
 @app.route("/assets/<filepath:path>")
 def assets(filepath):
     return static_file(filepath, root=os.path.join(FRONTEND_DIR, "assets"))
+
+
+@app.route("/config.json")
+def config():
+    response.content_type = 'application/json'
+    return {
+        "wsPort": CONFIG["ws_port"],
+        "env": "dev",
+        "featureFlags": {
+            "reports": True
+        }
+    }
 
 
 # SPA fallback (Vue/React router)

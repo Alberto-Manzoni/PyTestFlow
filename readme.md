@@ -40,7 +40,7 @@ pip install -r requirements.txt
 
 
 ```bash
-pip install "git+https://github.com/Alberto-Manzoni/PyTestFlow.git@v0.2.0-beta.1"
+python -m pip install "git+https://github.com/Alberto-Manzoni/PyTestFlow.git@main"
 ```
 
 ### Stage 2: `pipx install` user (one-command app install)
