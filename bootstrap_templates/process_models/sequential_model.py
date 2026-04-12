@@ -149,7 +149,7 @@ class SequentialProcessModel(Sequence):
             steps.append(self.callbacks["database_logging"])
 
         # Build Sequence
-        super().__init__(name=name, steps=steps)
+        super().__init__(name=name, steps=steps, apply_throttle=False)
 
     def _extract_button_from_response(self, user_response) -> str | None:
         if isinstance(user_response, dict):

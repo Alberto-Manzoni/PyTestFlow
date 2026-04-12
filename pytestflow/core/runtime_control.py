@@ -77,12 +77,12 @@ class RuntimeControl:
                 break
             time.sleep(min(remaining, 0.05))
 
-    def checkpoint_before_step(self, step_index: int) -> None:
+    def checkpoint_before_step(self, step_index: int, apply_throttle: bool = True) -> None:
         if self._stop_requested:
             raise RuntimeError("Stop requested")
 
         self.wait_until_resumed()
-        if step_index > 0:
+        if apply_throttle and step_index > 0:
             self.sleep_with_pause(self.get_throttle_seconds())
         self.wait_until_resumed()
 
