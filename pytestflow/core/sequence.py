@@ -13,10 +13,18 @@ from pytestflow.core.runtime_control import runtime_control
 
 
 class Sequence:
-    def __init__(self, name: str, steps: List[Callable] = None, default_parameters: dict = None, allow_parent_mutation: bool = False):
+    def __init__(
+        self,
+        name: str,
+        steps: List[Callable] = None,
+        default_parameters: dict = None,
+        allow_parent_mutation: bool = False,
+        apply_throttle: bool = True,
+    ):
         self.name = name
         self.steps = steps or []
         self.allow_parent_mutation = allow_parent_mutation
+        self.apply_throttle = apply_throttle
         self.results: List[tuple[str, PyTestflowState]] = []
         self._locals_stack: List[dict] = []  # Stack to manage ptf_context.locals
         self.default_parameters = default_parameters or {}
@@ -172,7 +180,10 @@ class Sequence:
                 results.append(("__flow_control__", self._flow_control_error_state(msg)))
                 break
 
-            runtime_control.checkpoint_before_step(runtime_start_index + transitions)
+            runtime_control.checkpoint_before_step(
+                runtime_start_index + transitions,
+                apply_throttle=self.apply_throttle,
+            )
             step_fn = steps[current_index]
             name, state = self._exec_step(step_fn)
             results.append((name, state))
