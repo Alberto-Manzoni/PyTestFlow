@@ -4,8 +4,15 @@ from pytestflow.core.sequence import TestSequence
 import sys
 from pathlib import Path
 import json
-from pytestflow.backend.uuids_handler import get_root_sequence_uuid, walk_sequence, resolve_uuids
+from pytestflow.backend.uuids_handler import resolve_uuids
 from pytestflow.config.config_manager import ConfigManager
+from pytestflow.steps.action_step import ActionStep # pyright: ignore[reportUnusedImport]
+from pytestflow.steps.pass_fail import PassFailStep # pyright: ignore[reportUnusedImport]
+from pytestflow.steps.numeric_limit import NumericLimitStep # pyright: ignore[reportUnusedImport]
+from pytestflow.steps.string_check import StringCheckStep # pyright: ignore[reportUnusedImport]
+from pytestflow.steps.df_numeric_limits import DFNumericLimitsStep # pyright: ignore[reportUnusedImport]
+from pytestflow.steps.waveform_limit import WaveformLimitStep # pyright: ignore[reportUnusedImport]
+from pytestflow.steps.message_pop_up import MessagePopUpStep # pyright: ignore[reportUnusedImport]
 
 config = ConfigManager()
 
