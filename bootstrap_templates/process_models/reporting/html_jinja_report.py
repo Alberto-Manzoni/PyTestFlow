@@ -317,6 +317,9 @@ def generate_html_jinja_report(
 
 @action_step(name="report_callback_jinja")
 def report_callback_jinja():
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print("JINJAAAAAAAA")
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++")
     main_results = ptf_context.locals.get("main_results") or ptf_context.locals.get("main_result")
     if main_results is None:
         raise ValueError("Main sequence results are missing. Expected 'main_results' in context.")

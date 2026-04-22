@@ -179,3 +179,5 @@ class SequentialProcessModel(Sequence):
         if self._pre_uut_step_name and name == self._pre_uut_step_name:
             ptf_context.locals["_pre_uut_user_response"] = self._extract_pre_uut_user_response(state)
         return name, state
+
+PROCESS_MODEL = SequentialProcessModel

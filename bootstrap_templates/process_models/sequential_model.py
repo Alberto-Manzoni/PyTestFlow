@@ -180,3 +180,4 @@ class SequentialProcessModel(Sequence):
         return name, state
 
 
+PROCESS_MODEL = SequentialProcessModel

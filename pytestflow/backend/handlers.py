@@ -12,8 +12,7 @@ from pathlib import Path
 
 class UserSession:
     def __init__(self):
-        self.process_model_callbacks = None
-        self.selected_process_model = "sequential_model"
+        self.process_model_callbacks = None        
 
     def set_selected_process_model_callbacks(self, callbacks):
         self.process_model_callbacks = callbacks
@@ -56,6 +55,7 @@ async def handle_query_process_models(args):
     })
 
 async def handle_select_process_model(args):
+    print(f"DEBUG: handle_select_process_model called with args: {args}")
     model_name = args.get("name")
     if model_name:
         user_session.set_selected_process_model(model_name)
@@ -87,13 +87,8 @@ async def handle_start_run(args):
         try:
             process_model_callbacks = user_session.get_selected_process_model_callbacks()
             args = args or {}
-            selected_model = (
-                args.get("process_model")
-                or args.get("processModel")
-                or user_session.get_selected_process_model()
-                or "sequential_model"
-            )
-            print(f"DEBUG: selected_model = {selected_model}")
+            
+            print(f"DEBUG: selected_model = {user_session.get_selected_process_model()}")
             runtime_control.set_stop_requested(False)
 
             await event_bus.emit("outbound", {
@@ -101,7 +96,7 @@ async def handle_start_run(args):
                 "args": "running"
             })
 
-            await asyncio.to_thread(run_sequence_file, process_model_callbacks, selected_model)
+            await asyncio.to_thread(run_sequence_file, process_model_callbacks, user_session.get_selected_process_model())
             if report_manager.has_report():
                 await event_bus.emit("outbound", {
                     "cmd": "report_generated",
