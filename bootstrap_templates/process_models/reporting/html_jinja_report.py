@@ -327,11 +327,7 @@ def report_callback_jinja():
         report_path = generate_html_jinja_report(serial_number, main_results)
         print(f"HTML Jinja report generated: {report_path}")
     except Exception as e:
-        print(f"Jinja report generation failed: {e}. Falling back to standard HTML report.")
-        # Fallback to standard report
-        from .html_report import generate_html_report
-        report_path = generate_html_report(serial_number, main_results)
-        print(f"Standard HTML report generated: {report_path}")
+        print(f"Jinja report generation failed: {e}.")
     
     report_manager.set_last_report(report_path)
     return report_path
