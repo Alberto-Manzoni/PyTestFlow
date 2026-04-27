@@ -13,7 +13,7 @@ PROCESS_MODELS_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROCESS_MODELS_DIR))
 
 # ora questo funziona come vuoi
-from reporting.html_report import generate_html_report
+from bootstrap_templates.process_models.reporting.html_report import report_callback_jinja
 
 
 # ---------------------
@@ -38,27 +38,28 @@ def post_uut_callback():
     pass
 
 # ✅ Report (placeholder)
-@action_step(name="report_callback")
-def report_callback():
-    # DEBUG save state snapshot for debugging / uncomment if needed
-    # with open("C:\\PRIVATO\\SW\\PyTestFlow\\PyTestFlow-main\\test_reports\\dataf_for_report.pkl", "wb") as f:
-    #     pickle.dump(ptf_context.locals, f)
+# Using Jinja HTML report callback instead of default
+# @action_step(name="report_callback")
+# def report_callback():
+#     # DEBUG save state snapshot for debugging / uncomment if needed
+#     # with open("C:\\PRIVATO\\SW\\PyTestFlow\\PyTestFlow-main\\test_reports\\dataf_for_report.pkl", "wb") as f:
+#     #     pickle.dump(ptf_context.locals, f)
 
-    main_results = ptf_context.locals.get("main_results") or ptf_context.locals.get("main_result")
-    if main_results is None:
-        raise ValueError("Main sequence results are missing. Expected 'main_results' in context.")
+#     main_results = ptf_context.locals.get("main_results") or ptf_context.locals.get("main_result")
+#     if main_results is None:
+#         raise ValueError("Main sequence results are missing. Expected 'main_results' in context.")
     
-    _pre_uut_user_response =  ptf_context.locals.get("_pre_uut_user_response")
-    sn = ""
-    if _pre_uut_user_response:
-        sn = _pre_uut_user_response.get("text", "")
+#     _pre_uut_user_response =  ptf_context.locals.get("_pre_uut_user_response")
+#     sn = ""
+#     if _pre_uut_user_response:
+#         sn = _pre_uut_user_response.get("text", "")
     
-    report_path = generate_html_report(sn, main_results)
+#     report_path = generate_html_report(sn, main_results)
     
-    report_manager.set_last_report(report_path)
+#     report_manager.set_last_report(report_path)
 
-    print(f"📝 HTML report generated: {report_path}")
-    return report_path
+#     print(f"📝 HTML report generated: {report_path}")
+#     return report_path
 
 # ✅ Database logging (placeholder)
 @action_step(name="database_logging_callback")
@@ -72,7 +73,7 @@ DEFAULT_CALLBACKS = {
     "pre_uut": pre_uut_callback,
     "main_sequence": None,           # mandatory
     "post_uut": post_uut_callback,
-    "report": report_callback,
+    "report": report_callback_jinja,
     "database_logging": database_logging_callback,
 }
 
@@ -178,6 +179,5 @@ class SequentialProcessModel(Sequence):
         if self._pre_uut_step_name and name == self._pre_uut_step_name:
             ptf_context.locals["_pre_uut_user_response"] = self._extract_pre_uut_user_response(state)
         return name, state
-
 
 PROCESS_MODEL = SequentialProcessModel

@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from bootstrap_templates.process_models.reporting import html_jinja_report
-from bootstrap_templates.process_models.reporting.html_jinja_report import (
+from bootstrap_templates.process_models.reporting import html_report
+from bootstrap_templates.process_models.reporting.html_report import (
     generate_html_jinja_report,
     report_callback_jinja,
 )
@@ -118,7 +118,7 @@ def test_generate_html_jinja_report_missing_jinja(monkeypatch: pytest.MonkeyPatc
     def _raise_missing():
         raise RuntimeError("Jinja reporting requires 'jinja2'. Install it with: pip install jinja2")
 
-    monkeypatch.setattr(html_jinja_report, "_load_jinja2", _raise_missing)
+    monkeypatch.setattr(html_report, "_load_jinja2", _raise_missing)
 
     with pytest.raises(RuntimeError, match="pip install jinja2"):
         generate_html_jinja_report("SN-MISSING", root_state, out_dir=str(tmp_path))
@@ -129,7 +129,7 @@ def test_report_callback_jinja_sets_report_manager(tmp_path: Path, monkeypatch: 
     def main_for_jinja_report_test():
         return True
 
-    monkeypatch.setattr(html_jinja_report, "REPORTS_FOLDER", str(tmp_path))
+    monkeypatch.setattr(html_report, "REPORTS_FOLDER", str(tmp_path))
 
     model = SequentialProcessModel(
         name="pm_jinja_report",
