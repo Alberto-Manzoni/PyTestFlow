@@ -22,7 +22,6 @@ def get_available_sequences():
     sequences = []
     try:
         SEQUENCES_FOLDER = config.get_path("test_sequences")
-        print(f"Looking for sequences in: {SEQUENCES_FOLDER}")
         seq_folder = Path(SEQUENCES_FOLDER)
         if seq_folder.exists() and seq_folder.is_dir():
             for file in seq_folder.glob("*.py"):

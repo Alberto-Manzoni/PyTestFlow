@@ -35,7 +35,6 @@ def get_available_process_models():
     try:
         config = ConfigManager()
         PROCESS_MODELS_FOLDER = config.get_path("process_models")
-        print(f"Looking for process models in: {PROCESS_MODELS_FOLDER}")
         pm_folder = Path(PROCESS_MODELS_FOLDER)
         if pm_folder.exists() and pm_folder.is_dir():
             for file in pm_folder.glob("*.py"):
@@ -55,7 +54,6 @@ async def handle_query_process_models(args):
     })
 
 async def handle_select_process_model(args):
-    print(f"DEBUG: handle_select_process_model called with args: {args}")
     model_name = args.get("name")
     if model_name:
         user_session.set_selected_process_model(model_name)
@@ -72,8 +70,6 @@ async def handle_query_seq_files(args):
     })
 
 async def handle_get_seq_structure(args):
-    print("DEBUG: handle_get_seq_structure called with args:")
-    print(args)
     seq_struct, hooks = sequences_info.get_seq_structure(args["file_name"])
     user_session.set_selected_process_model_callbacks(hooks)
     await event_bus.emit("outbound", {
@@ -82,13 +78,11 @@ async def handle_get_seq_structure(args):
     })
 
 async def handle_start_run(args):
-    print(f"DEBUG: handle_start_run called with args: {args}")
     if True:
         try:
             process_model_callbacks = user_session.get_selected_process_model_callbacks()
             args = args or {}
             
-            print(f"DEBUG: selected_model = {user_session.get_selected_process_model()}")
             runtime_control.set_stop_requested(False)
 
             await event_bus.emit("outbound", {
@@ -206,7 +200,6 @@ def handler_guard(handler):
     return wrapped
 
 def init_handlers():
-    print("Initializing backend handlers...")
     event_bus.on("query_process_models", handler_guard(handle_query_process_models))
     event_bus.on("select_process_model", handler_guard(handle_select_process_model))
     event_bus.on("query_seq_files", handler_guard(handle_query_seq_files))
