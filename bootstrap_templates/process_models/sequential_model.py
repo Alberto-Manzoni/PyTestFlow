@@ -1,4 +1,3 @@
-import pickle
 from pytestflow.core.sequence import Sequence
 from pytestflow.steps.action_step import action_step
 from pytestflow.core.context import ptf_context
@@ -8,11 +7,9 @@ from pytestflow.backend.report_manager import report_manager
 import sys
 from pathlib import Path
 
-# path relativo alla cartella che contiene reporting
 PROCESS_MODELS_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROCESS_MODELS_DIR))
 
-# ora questo funziona come vuoi
 from bootstrap_templates.process_models.reporting.html_report import report_callback_jinja
 
 
@@ -37,36 +34,12 @@ def post_uut_callback():
     print("📝 Post-UUT executed.")
     pass
 
-# ✅ Report (placeholder)
-# Using Jinja HTML report callback instead of default
-# @action_step(name="report_callback")
-# def report_callback():
-#     # DEBUG save state snapshot for debugging / uncomment if needed
-#     # with open("C:\\PRIVATO\\SW\\PyTestFlow\\PyTestFlow-main\\test_reports\\dataf_for_report.pkl", "wb") as f:
-#     #     pickle.dump(ptf_context.locals, f)
-
-#     main_results = ptf_context.locals.get("main_results") or ptf_context.locals.get("main_result")
-#     if main_results is None:
-#         raise ValueError("Main sequence results are missing. Expected 'main_results' in context.")
-    
-#     _pre_uut_user_response =  ptf_context.locals.get("_pre_uut_user_response")
-#     sn = ""
-#     if _pre_uut_user_response:
-#         sn = _pre_uut_user_response.get("text", "")
-    
-#     report_path = generate_html_report(sn, main_results)
-    
-#     report_manager.set_last_report(report_path)
-
-#     print(f"📝 HTML report generated: {report_path}")
-#     return report_path
 
 # ✅ Database logging (placeholder)
 @action_step(name="database_logging_callback")
 def database_logging_callback():
     print("💾 Database logging executed.")
     return "DB logging done"
-
 
 
 DEFAULT_CALLBACKS = {

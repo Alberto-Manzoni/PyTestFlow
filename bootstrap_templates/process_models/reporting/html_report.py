@@ -1,11 +1,9 @@
 from __future__ import annotations
-
 import os
 import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-
 from pytestflow.backend.report_manager import report_manager
 from pytestflow.config.config_manager import ConfigManager
 from pytestflow.core.context import ptf_context
