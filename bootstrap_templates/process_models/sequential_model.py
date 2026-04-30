@@ -56,13 +56,11 @@ class SequentialProcessModel(Sequence):
         self,
         name: str = "SequentialProcessModel",
         callbacks: dict | None = None,
-        cancel_action: str = "end",
     ):
         # Validate main sequence presence
         callbacks = callbacks or {}
         # Merge with defaults
         self.callbacks = {**DEFAULT_CALLBACKS, **callbacks}
-        self.cancel_action = cancel_action
         self._pre_uut_step_name = None
 
         assert self.callbacks["main_sequence"] is not None, "Main Seq callback must be provided."
@@ -71,24 +69,11 @@ class SequentialProcessModel(Sequence):
         if pre_uut_step is not None:
             self._pre_uut_step_name = getattr(pre_uut_step, "name", getattr(pre_uut_step, "__name__", "pre_uut"))
 
-        @flow_control_step(name="pre_uut_flow_gate")
+        @flow_control_step(name="pre_uut_flow_gate", next_steps={0: "end", 1: "next"})
         def pre_uut_flow_gate():
             user_response = ptf_context.locals.get("_pre_uut_user_response")
             button = self._extract_button_from_response(user_response)
-
-            if button == "cancel":
-                ptf_context.locals["_ptf_next_step"] = self.cancel_action
-                return {
-                    "decision": self.cancel_action,
-                    "reason": "pre_uut_cancel",
-                    "user_response": user_response,
-                }
-
-            return {
-                "decision": "next",
-                "reason": "pre_uut_continue",
-                "user_response": user_response,
-            }
+            return button == "run"
 
         steps = []
         if pre_uut_step is not None:
