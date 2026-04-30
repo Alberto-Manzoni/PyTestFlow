@@ -15,7 +15,7 @@ from pytestflow.steps.flow_control import flow_control_step
     store_as="operator_confirmation_response",
 )
 def operator_confirmation():
-    return "Operator confirmed bench is ready"
+    return "Operator confirmation step executed"
 
 
 @flow_control_step(name="check_operator_confirmation", next_steps={0: "end", 1: "next"})
@@ -25,8 +25,7 @@ def check_operator_confirmation():
 
 
 @pass_fail_step(name="power_good_check")
-def power_good_check():
-     
+def power_good_check():     
     # Typical use case: a digital status pin or a single readiness condition.
     return True
 
@@ -35,6 +34,53 @@ def power_good_check():
 def vcore_voltage_check():
     # Typical use case: one scalar analog measurement against limits.
     return 1.15
+
+
+@message_pop_up_step(
+    name="operator_product_selection",
+    title="Operator Product Selection",
+    msg="Select Product Version",
+    buttons=["Ver 1", "Ver 2", "Ver 3"],
+    show_response_box=False,
+    store_as="operator_product_selection_response",
+)
+def operator_product_selection():
+    return "Operator product selection step executed"
+
+
+@flow_control_step(name="check_operator_product_selection", next_steps={0: "ver1_test", 1: "ver2_test", 2: "ver3_test"})
+def check_operator_product_selection():
+    versions = ["Ver 1", "Ver 2", "Ver 3"]
+    value = ptf_context.locals.get("operator_product_selection_response")
+    idx = versions.index(value["button"])    
+    return  idx
+
+
+@numeric_limit_step(name="ver1_test", limit=(4.9, 5.1), mode="between")
+def ver1_test():
+    # Typical use case: one scalar analog measurement against limits.
+    return 5.0
+
+
+@numeric_limit_step(name="ver2_test", limit=(11.9, 12.1), mode="between")
+def ver2_test():
+    # Typical use case: one scalar analog measurement against limits.
+    return 12.0
+
+
+@numeric_limit_step(name="ver3_test", limit=(23.9, 24.1), mode="between")
+def ver3_test():
+    # Typical use case: one scalar analog measurement against limits.
+    return 24.0
+
+
+@flow_control_step(name="go_to_end_after_ver1", next_steps={0: "end"})
+def go_to_end_after_ver1():
+    return 0
+
+@flow_control_step(name="go_to_end_after_ver2", next_steps={0: "end"})
+def go_to_end_after_ver2():
+    return 0
 
 
 def main_sequence() -> TestSequence:
@@ -46,6 +92,13 @@ def main_sequence() -> TestSequence:
             check_operator_confirmation,
             power_good_check,
             vcore_voltage_check,
+            operator_product_selection,
+            check_operator_product_selection,
+            ver1_test,
+            go_to_end_after_ver1,
+            ver2_test,
+            go_to_end_after_ver2,
+            ver3_test,
         ],
         cleanup_steps=[],
     )
